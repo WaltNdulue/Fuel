@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>FUEL. Food Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--card:#1a1a1a;--inset:#111;--row:#161616;--line:#222;--line2:#2a2a2a;--text:#f5f0e8;--dim:#555;--faint:#3a3a3a;--p:#f56060;--c:#c8f560;--a:#60aff5;--on:#0f0f0f;--cbg:#1a2a0a;--abg:#0a1a2a;--abtn:#101a24;--aline:#1e3550;--del:#663333;--x:#444;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f7f5f0;--card:#fff;--inset:#f1eee8;--row:#fff;--line:#e4e0d6;--line2:#d8d3c6;--text:#1c1b18;--dim:#777;--faint:#999;--p:#d63a3a;--c:#5f8a00;--a:#1f7ad0;--on:#fff;--cbg:#eef6d6;--abg:#e3f0fc;--abtn:#eaf3fc;--aline:#b8d4f0;--del:#b55;--x:#999;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f7f5f0;--card:#fff;--inset:#f1eee8;--row:#fff;--line:#e4e0d6;--line2:#d8d3c6;--text:#1c1b18;--dim:#777;--faint:#999;--p:#d63a3a;--c:#5f8a00;--a:#1f7ad0;--on:#fff;--cbg:#eef6d6;--abg:#e3f0fc;--abtn:#eaf3fc;--aline:#b8d4f0;--del:#b55;--x:#999;color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'DM Mono',ui-monospace,Menlo,monospace;padding:24px 16px 60px}
+input{outline:none;background:var(--inset);border:1px solid var(--line2);border-radius:7px;font:inherit;font-size:13px;padding:12px 14px;width:100%;color:var(--text)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+button{cursor:pointer;border:none;font-family:inherit;color:inherit;background:none}
+::placeholder{color:var(--faint)}
+.w{max-width:500px;margin:0 auto}
+h1{font-family:'Unbounded',system-ui,sans-serif;font-size:22px;font-weight:900}
+h1 span{color:var(--c)}
+.date{color:var(--faint);font-size:10px;margin-top:3px;letter-spacing:.08em}
+.lbl{font-size:9px;letter-spacing:.12em;color:var(--dim);margin-bottom:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0 22px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.stat .lbl{margin-bottom:6px}
+.val{display:flex;align-items:baseline;gap:4px}
+.val b{font-family:'Unbounded',system-ui,sans-serif;font-size:24px;font-weight:700}
+.val small{font-size:10px;color:var(--faint)}
+.sub{font-size:9px;color:var(--dim);margin-top:4px}
+.bar{height:3px;background:var(--line2);border-radius:2px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;border-radius:2px;transition:width .4s ease}
+.tabs{display:flex;gap:6px;background:var(--card);border-radius:10px;padding:4px;margin-bottom:22px}
+.tabs button{flex:1;color:var(--dim);font-size:11px;font-weight:500;padding:8px 0;border-radius:7px;transition:all .15s}
+.tabs button.on{background:var(--c);color:var(--on)}
+#flash:empty{display:none}
+.flash{border:1px solid;border-radius:8px;padding:8px 14px;font-size:11px;margin-bottom:14px;animation:pop .25s ease forwards}
+@keyframes pop{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sm{font-size:9px;letter-spacing:.08em;margin-bottom:6px}
+.mb{margin-bottom:10px}
+.go{font-size:13px;font-weight:500;padding:12px 0;border-radius:8px;width:100%;color:var(--on)}
+.list{display:flex;flex-direction:column;gap:6px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--row);border:1px solid var(--line);border-radius:9px;padding:10px 14px}
+.inset{background:var(--inset);border-radius:8px;padding:8px 12px;border:0}
+.item .n{font-size:12px}
+.meta{font-size:10px;margin-top:3px}
+.r{display:flex;align-items:center;gap:10px;font-size:11px}
+.x{color:var(--x);font-size:16px;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card);border:1px solid var(--line2);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;transition:all .15s}
+.chip:hover{border-color:var(--c);background:var(--cbg)}
+.chip.w2{background:var(--abtn);border-color:var(--aline);color:var(--a)}
+.chip.w2:hover{border-color:var(--a);background:var(--abg)}
+.chip span:first-child{font-size:12px;line-height:1.3}
+.chip span+span{font-size:10px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.head .lbl{margin:0}
+.new{font-size:11px;font-weight:500;padding:6px 14px;border-radius:7px;color:var(--on)}
+.form{background:var(--card);border:1px solid var(--line2);border-radius:10px;padding:16px;margin-bottom:14px}
+.form .lbl{margin-bottom:12px;letter-spacing:.1em}
+.btns{display:flex;gap:8px}
+.btns .go{flex:1;padding:9px 0;font-size:12px;border-radius:7px;width:auto}
+.btns .cx{background:var(--line);color:var(--dim);font-size:12px;padding:9px 16px;border-radius:7px}
+.ed{background:var(--line);color:var(--dim);font-size:11px;padding:5px 10px;border-radius:6px}
+.ed.d{color:var(--del)}
+.empty{color:var(--faint);font-size:12px;text-align:center;padding:20px 0}
+.clr{color:var(--faint);font-size:10px;letter-spacing:.05em}
+.p{color:var(--p)}.c{color:var(--c)}.a{color:var(--a)}.sep{color:var(--line2)}
+</style>
+</head>
+<body>
+<div class="w">
+  <h1>FUEL<span>.</span></h1>
+  <p class="date" id="date"></p>
+  <div class="stats" id="stats"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="flash"></div>
+  <div id="view"></div>
+</div>
+<script>
+const DF=[["Eggs (1 large)",6,72],["Chicken Breast (100g)",31,165],["Greek Yogurt (100g)",10,59],["Milk (1 cup)",8,149],["Oats (100g)",17,389],["Banana",1,89],["Salmon (100g)",25,208],["Rice (100g cooked)",3,130],["Whey Protein (1 scoop)",25,120],["Almonds (30g)",6,173]].map((f,i)=>({id:"df"+(i+1),name:f[0],protein:f[1],calories:f[2]}));
+const DW=[["Walk",150],["Incline Treadmill",300],["Run",350]].map((w,i)=>({id:"dw"+(i+1),name:w[0],burned:w[1]}));
+const PG=150,CMIN=2000,CMAX=2200;
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const ld=(k,f)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):f}catch(e){return f}};
+const ldDay=k=>{const v=ld(k,null);return v&&v.date===today()?v.data:[]};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const S={foods:ld("fuel_foods",DF),workouts:ld("fuel_workouts",DW),log:ldDay("fuel_log"),acts:ldDay("fuel_activities"),tab:"today",
+  q:{name:"",protein:"",calories:""},a:{name:"",burned:""},nf:{name:"",protein:"",calories:""},nw:{name:"",burned:""},
+  editF:null,editW:null,showF:false,showW:false};
+const $=id=>document.getElementById(id);
+const sum=(a,k)=>a.reduce((s,e)=>s+e[k],0);
+const uid=p=>p+Date.now()+Math.floor(Math.random()*1000);
+function save(){sv("fuel_foods",S.foods);sv("fuel_workouts",S.workouts);sv("fuel_log",{date:today(),data:S.log});sv("fuel_activities",{date:today(),data:S.acts})}
+let ft;
+function flash(msg,col){const el=$("flash");const a=col==="a";
+  el.innerHTML='<div class="flash" style="color:var(--'+(a?"a":"c")+');border-color:var(--'+(a?"a":"c")+');background:var(--'+(a?"abg":"cbg")+')">✓ '+esc(msg)+'</div>';
+  clearTimeout(ft);ft=setTimeout(()=>{el.innerHTML=""},1100)}
+const inp=(g,f,ph,col,type,enter,extra)=>'<input '+(type?'type="number" inputmode="decimal" ':'')+'data-g="'+g+'" data-f="'+f+'"'+(enter?' data-enter="'+enter+'"':'')+' value="'+esc(S[g][f])+'" placeholder="'+ph+'" style="color:'+col+(extra||"")+'">';
+
+function stats(){
+  const tp=sum(S.log,"protein"),ci=sum(S.log,"calories"),b=sum(S.acts,"burned"),net=ci-b;
+  const pp=Math.min(tp/PG*100,100),cp=Math.min(net/CMAX*100,100);
+  $("stats").innerHTML=
+   '<div class="stat"><div class="lbl">PROTEIN</div><div class="val"><b class="p">'+tp+'</b><small>/ '+PG+'g</small></div><div class="bar"><i style="width:'+pp+'%;background:var(--p)"></i></div></div>'+
+   '<div class="stat"><div class="lbl">NET CALORIES</div><div class="val"><b class="c">'+net+'</b><small>/ '+CMIN+'–'+CMAX+'kcal</small></div>'+(b>0?'<div class="sub">'+ci+' in · '+b+' burned</div>':'')+'<div class="bar"><i style="width:'+Math.max(cp,0)+'%;background:var(--c)"></i></div></div>';
+}
+function tabs(){$("tabs").innerHTML=[["today","Today"],["catalog","My List"],["manage","Edit"]].map(t=>'<button data-a="tab" data-id="'+t[0]+'" class="'+(S.tab===t[0]?"on":"")+'">'+t[1]+'</button>').join("")}
+
+function today_(){
+  let h='<div class="card"><div class="lbl">QUICK FOOD INPUT</div><div class="mb">'+inp("q","name","Name (optional)","var(--text)",0,"addQuick")+'</div>'+
+   '<div class="g2 mb"><div><div class="sm p">PROTEIN (g)</div>'+inp("q","protein","0","var(--p)",1,"addQuick")+'</div><div><div class="sm c">CALORIES</div>'+inp("q","calories","0","var(--c)",1,"addQuick")+'</div></div>'+
+   '<button class="go" data-a="addQuick" style="background:var(--c)">Add</button></div>';
+  h+='<div class="card" style="margin-bottom:22px"><div class="lbl a">ACTIVITY</div><div class="mb">'+inp("a","name","Activity name (e.g. Morning run)","var(--text)",0,"addAct")+'</div>'+
+   '<div class="sm a">CALORIES BURNED</div><div class="mb">'+inp("a","burned","0","var(--a)",1,"addAct")+'</div>'+
+   '<button class="go" data-a="addAct" style="background:var(--a)">Log Activity</button>';
+  if(S.acts.length)h+='<div class="list" style="margin-top:14px">'+S.acts.map(a=>'<div class="item inset"><span class="n a">'+esc(a.name)+'</span><div class="r"><span class="a">−'+a.burned+' kcal</span><button class="x" data-a="rmAct" data-id="'+a.id+'" aria-label="Remove">×</button></div></div>').join("")+'</div>';
+  h+='</div>';
+  if(S.log.length){
+    h+='<div class="lbl" style="margin-bottom:10px">TODAY’S FOOD LOG</div><div class="list" style="margin-bottom:12px">'+
+     S.log.map((e,i)=>'<div class="item"><div class="r"><span style="color:var(--faint);font-size:10px;min-width:18px">#'+(i+1)+'</span><span class="n" style="color:'+(e.label?"var(--text)":"var(--dim)")+'">'+esc(e.label||"Quick entry")+'</span></div><div class="r"><span class="p">'+e.protein+'g</span><span class="c">'+e.calories+'kcal</span><button class="x" data-a="rmLog" data-id="'+e.id+'" aria-label="Remove">×</button></div></div>').join("")+
+     '</div><button class="clr" data-a="clearLog">clear today</button>';
+  }else h+='<div class="empty">nothing logged yet</div>';
+  return h;
+}
+function catalog(){
+  return '<div class="lbl">🍽 FOODS · TAP TO ADD</div><div class="chips">'+S.foods.map(f=>'<button class="chip" data-a="tapFood" data-id="'+f.id+'"><span>'+esc(f.name)+'</span><span><span class="p">'+f.protein+'g</span><span class="sep"> · </span><span class="c">'+f.calories+'kcal</span></span></button>').join("")+'</div>'+
+   '<div class="lbl a" style="margin-top:30px">🏃 WORKOUTS · TAP TO LOG</div><div class="chips">'+(S.workouts.map(w=>'<button class="chip w2" data-a="tapWorkout" data-id="'+w.id+'"><span>'+esc(w.name)+'</span><span>−'+w.burned+'kcal</span></button>').join("")||'<div class="empty">no saved workouts yet</div>')+'</div>';
+}
+function manage(){
+  let h='<div class="head"><div class="lbl">🍽 SAVED FOODS</div><button class="new" data-a="toggleF" style="background:var(--c)">+ New food</button></div>';
+  if(S.showF)h+='<div class="form"><div class="lbl">'+(S.editF?"EDIT FOOD":"NEW FOOD")+'</div><div class="mb">'+inp("nf","name","Food name","var(--text)")+'</div><div class="g2 mb">'+inp("nf","protein","Protein (g)","var(--p)",1)+inp("nf","calories","Calories","var(--c)",1)+'</div><div class="btns"><button class="go" data-a="saveF" style="background:var(--c)">Save</button><button class="cx" data-a="cancelF">Cancel</button></div></div>';
+  h+='<div class="list">'+S.foods.map(f=>'<div class="item"><div><div class="n">'+esc(f.name)+'</div><div class="meta"><span class="p">'+f.protein+'g protein</span><span class="sep"> · </span><span class="c">'+f.calories+' kcal</span></div></div><div class="r"><button class="ed" data-a="editF" data-id="'+f.id+'">edit</button><button class="ed d" data-a="delF" data-id="'+f.id+'">del</button></div></div>').join("")+'</div>';
+  h+='<div style="height:32px"></div><div class="head"><div class="lbl a">🏃 SAVED WORKOUTS</div><button class="new" data-a="toggleW" style="background:var(--a)">+ New workout</button></div>';
+  if(S.showW)h+='<div class="form"><div class="lbl">'+(S.editW?"EDIT WORKOUT":"NEW WORKOUT")+'</div><div class="mb">'+inp("nw","name","Workout name (e.g. Incline walk 30 min)","var(--text)")+'</div><div class="mb">'+inp("nw","burned","Calories burned","var(--a)",1)+'</div><div class="btns"><button class="go" data-a="saveW" style="background:var(--a)">Save</button><button class="cx" data-a="cancelW">Cancel</button></div></div>';
+  h+='<div class="list">'+S.workouts.map(w=>'<div class="item"><div><div class="n a">'+esc(w.name)+'</div><div class="meta a">'+w.burned+' kcal burned</div></div><div class="r"><button class="ed" data-a="editW" data-id="'+w.id+'">edit</button><button class="ed d" data-a="delW" data-id="'+w.id+'">del</button></div></div>').join("")+'</div>';
+  return h;
+}
+function render(){save();stats();tabs();$("view").innerHTML=S.tab==="today"?today_():S.tab==="catalog"?catalog():manage()}
+
+const A={
+  tab:id=>{S.tab=id},
+  addQuick(){const q=S.q;if(!q.protein&&!q.calories)return;const nm=q.name.trim();
+    S.log.push({id:uid("q"),label:nm||null,protein:Number(q.protein)||0,calories:Number(q.calories)||0});
+    flash(nm?"Added "+nm:"+"+(q.calories||0)+" kcal / +"+(q.protein||0)+"g");S.q={name:"",protein:"",calories:""}},
+  tapFood(id){const f=S.foods.find(x=>x.id===id);if(!f)return;S.log.push({id:uid("c"),label:f.name,protein:f.protein,calories:f.calories});flash(f.name)},
+  rmLog(id){S.log=S.log.filter(e=>e.id!==id)},
+  clearLog(){S.log=[]},
+  addAct(){const a=S.a;if(!a.burned)return;S.acts.push({id:uid("a"),name:a.name.trim()||"Activity",burned:Number(a.burned)||0});flash("Burned "+a.burned+" kcal","a");S.a={name:"",burned:""}},
+  rmAct(id){S.acts=S.acts.filter(x=>x.id!==id)},
+  tapWorkout(id){const w=S.workouts.find(x=>x.id===id);if(!w)return;S.acts.push({id:uid("a"),name:w.name,burned:w.burned});flash(w.name+" · −"+w.burned+" kcal","a")},
+  toggleF(){S.showF=!S.showF;S.editF=null;S.nf={name:"",protein:"",calories:""}},
+  cancelF(){S.showF=false;S.editF=null},
+  editF(id){const f=S.foods.find(x=>x.id===id);S.editF=id;S.nf={name:f.name,protein:String(f.protein),calories:String(f.calories)};S.showF=true},
+  saveF(){const n=S.nf;if(!n.name||!n.protein||!n.calories)return;const v={name:n.name,protein:Number(n.protein),calories:Number(n.calories)};
+    if(S.editF){S.foods=S.foods.map(x=>x.id===S.editF?{...x,...v}:x);S.editF=null}else S.foods.push({id:uid("u"),...v});
+    S.nf={name:"",protein:"",calories:""};S.showF=false},
+  delF(id){S.foods=S.foods.filter(x=>x.id!==id)},
+  toggleW(){S.showW=!S.showW;S.editW=null;S.nw={name:"",burned:""}},
+  cancelW(){S.showW=false;S.editW=null},
+  editW(id){const w=S.workouts.find(x=>x.id===id);S.editW=id;S.nw={name:w.name,burned:String(w.burned)};S.showW=true},
+  saveW(){const n=S.nw;if(!n.name||!n.burned)return;const v={name:n.name,burned:Number(n.burned)};
+    if(S.editW){S.workouts=S.workouts.map(x=>x.id===S.editW?{...x,...v}:x);S.editW=null}else S.workouts.push({id:uid("w"),...v});
+    S.nw={name:"",burned:""};S.showW=false},
+  delW(id){S.workouts=S.workouts.filter(x=>x.id!==id)}
+};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||!A[b.dataset.a])return;A[b.dataset.a](b.dataset.id);render()});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.g)S[t.dataset.g][t.dataset.f]=t.value});
+document.addEventListener("keydown",e=>{const t=e.target;if(e.key==="Enter"&&t.dataset&&t.dataset.enter){A[t.dataset.enter]();render()}});
+$("date").textContent=new Date().toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"}).toUpperCase();
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>
